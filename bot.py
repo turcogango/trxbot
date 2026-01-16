@@ -1,8 +1,9 @@
+import os
 import requests
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
-BOT_TOKEN = "8346076386:AAEZ9F261d67xfitMfejGq2T6zIpVfvcYXI"
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 ADDRESS = "TSjQYavgJBGPr8iV3zH7qo1bx927qKVMwA"
 API_URL = "https://apilist.tronscan.org/api/account"
@@ -15,10 +16,8 @@ async def tether(update: Update, context: ContextTypes.DEFAULT_TYPE):
         r = requests.get(API_URL, params={"address": ADDRESS}, timeout=10)
         data = r.json()
 
-        # TRX
         trx_balance = data.get("balance", 0) / 1_000_000
 
-        # USDT (TRC20)
         usdt_balance = 0.0
         for t in data.get("trc20token_balances", []):
             if t.get("tokenId") == "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t":
@@ -33,7 +32,8 @@ async def tether(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(text)
 
-    except Exception:
+    except Exception as e:
+        print(e)
         await update.message.reply_text("❌ Veri okunamadı")
 
 
